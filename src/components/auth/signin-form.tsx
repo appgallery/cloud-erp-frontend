@@ -7,6 +7,8 @@ import { EmailIcon, PasswordIcon } from "@/components/common/icons";
 import { InputGroup } from "@/components/forms/input-group";
 import { Checkbox } from "@/components/forms/checkbox";
 import { useAuthStore } from "@/store/use-auth-store";
+import { authApi } from "@/lib/api/auth/auth";
+import { toast } from "sonner";
 
 export function SigninForm() {
   const router = useRouter();
@@ -17,7 +19,6 @@ export function SigninForm() {
     remember: true,
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -34,7 +35,6 @@ export function SigninForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -42,11 +42,18 @@ export function SigninForm() {
         throw new Error("Email and password are required");
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      login(data.email);
+      // Call the real API endpoint
+      const response = await authApi.login({
+        email: data.email,
+        password: data.password,
+      });
+
+      login(response.user, response.token);
+      toast.success("Successfully signed in!");
       router.push("/dashboard");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Sign in failed");
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Sign in failed";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -114,8 +121,6 @@ export function SigninForm() {
             )}
           </button>
         </div>
-
-        {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
       </form>
 
       <div className="mt-6 text-center text-sm text-dark-5 dark:text-dark-6">

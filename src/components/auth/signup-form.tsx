@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { EmailIcon, PasswordIcon, UserIcon } from "@/components/common/icons";
+import { EmailIcon, PasswordIcon } from "@/components/common/icons";
 import { InputGroup } from "@/components/forms/input-group";
 import { useAuthStore } from "@/store/use-auth-store";
+import { authApi } from "@/lib/api/auth/auth";
 import { Building2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function SignupForm() {
   const router = useRouter();
@@ -19,7 +21,6 @@ export function SignupForm() {
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -36,7 +37,6 @@ export function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -50,11 +50,20 @@ export function SignupForm() {
         throw new Error("Organization and Company names are required");
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      login(data.email || "newuser@clouderp.com");
+      // Call the real API endpoint
+      const response = await authApi.register({
+        organizationName: data.organizationName,
+        companyName: data.companyName,
+        email: data.email,
+        password: data.password,
+      });
+
+      login(response.user, response.token);
+      toast.success("Account created successfully!");
       router.push("/dashboard");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Sign up failed");
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Sign up failed";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -140,8 +149,6 @@ export function SignupForm() {
             )}
           </button>
         </div>
-
-        {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
       </form>
 
       <div className="mt-6 text-center text-sm text-dark-5 dark:text-dark-6">

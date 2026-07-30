@@ -1,16 +1,20 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface User {
+export interface User {
+  id?: string;
   name: string;
   email: string;
   role: string;
+  organizationName?: string;
+  companyName?: string;
 }
 
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
-  login: (email: string) => void;
+  token: string | null;
+  login: (userData: User, token: string) => void;
   logout: () => void;
 }
 
@@ -19,20 +23,23 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       isAuthenticated: false,
       user: null,
-      login: (email: string) => {
-        const username = email ? email.split("@")[0] : "Admin User";
-        const formattedName =
-          username.charAt(0).toUpperCase() + username.slice(1);
+      token: null,
+      login: (user: User, token: string) => {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("auth-token", token);
+        }
         set({
           isAuthenticated: true,
-          user: {
-            name: formattedName || "Admin User",
-            email: email || "admin@clouderp.com",
-            role: "System Administrator",
-          },
+          user,
+          token,
         });
       },
-      logout: () => set({ isAuthenticated: false, user: null }),
+      logout: () => {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("auth-token");
+        }
+        set({ isAuthenticated: false, user: null, token: null });
+      },
     }),
     {
       name: "cloud-erp-auth-session",

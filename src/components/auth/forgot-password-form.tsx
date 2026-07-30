@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { EmailIcon, PasswordIcon } from "@/components/common/icons";
 import { InputGroup } from "@/components/forms/input-group";
+import { authApi } from "@/lib/api/auth/auth";
 
 type Step = "EMAIL" | "OTP" | "RESET";
 
@@ -17,21 +18,19 @@ export function ForgotPasswordForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
       if (!email.includes("@")) throw new Error("Please enter a valid email address");
-      // Simulate API call to send OTP
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await authApi.sendOtp(email);
       toast.success(`OTP sent to ${email}`);
       setStep("OTP");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to send OTP");
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Failed to send OTP";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -39,17 +38,16 @@ export function ForgotPasswordForm() {
 
   const handleOtpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
       if (otp.length < 4) throw new Error("Please enter a valid OTP");
-      // Simulate OTP verification
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await authApi.verifyOtp({ email, otp });
       toast.success("OTP verified successfully");
       setStep("RESET");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Invalid OTP");
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Invalid OTP";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -57,24 +55,22 @@ export function ForgotPasswordForm() {
 
   const handleResetSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
       if (password.length < 6) throw new Error("Password must be at least 6 characters");
       if (password !== confirmPassword) throw new Error("Passwords do not match");
       
-      // Simulate password reset
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await authApi.resetPassword({ email, otp, password });
       toast.success("Password changed successfully!");
       
-      // Redirect to login after successful reset
       setTimeout(() => {
         router.push("/login");
       }, 1500);
       
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to reset password");
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Failed to reset password";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -110,8 +106,6 @@ export function ForgotPasswordForm() {
               )}
             </button>
           </div>
-
-          {error && <p className="text-sm text-red-500 mt-2 mb-4">{error}</p>}
         </form>
       )}
 
@@ -151,8 +145,6 @@ export function ForgotPasswordForm() {
               )}
             </button>
           </div>
-
-          {error && <p className="text-sm text-red-500 mt-2 mb-4">{error}</p>}
         </form>
       )}
 
@@ -199,8 +191,6 @@ export function ForgotPasswordForm() {
               )}
             </button>
           </div>
-
-          {error && <p className="text-sm text-red-500 mt-2 mb-4">{error}</p>}
         </form>
       )}
 
