@@ -1,39 +1,35 @@
-import { apiClient } from '../baseApicall';
+import { client } from '../client';
+import {
+  LoginDto,
+  SignupDto,
+  RefreshDto,
+  TokenPair,
+  SignupResponse,
+  Company,
+} from '../types';
 
-export interface AuthResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    organizationName: string;
-    companyName: string;
-    role: string;
-  };
-}
 export const authApi = {
-  login: async (data: Record<string, any>) => {
-    const response = await apiClient.post<AuthResponse>(`/auth/login`, data);
-    return response.data;
-  },
-  
-  register: async (data: Record<string, any>) => {
-    const response = await apiClient.post<AuthResponse>(`/auth/signup`, data);
+  login: async (data: LoginDto): Promise<TokenPair> => {
+    const response = await client.post<TokenPair>('/auth/login', data);
     return response.data;
   },
 
-  sendOtp: async (email: string) => {
-    const response = await apiClient.post(`/auth/forgot-password/send-otp`, { email });
+  signup: async (data: SignupDto): Promise<SignupResponse> => {
+    const response = await client.post<SignupResponse>('/auth/signup', data);
     return response.data;
   },
 
-  verifyOtp: async (data: { email: string; otp: string }) => {
-    const response = await apiClient.post<{ resetToken: string }>(`/auth/forgot-password/verify-otp`, data);
+  refresh: async (data: RefreshDto): Promise<TokenPair> => {
+    const response = await client.post<TokenPair>('/auth/refresh', data);
     return response.data;
   },
 
-  resetPassword: async (data: Record<string, any>) => {
-    const response = await apiClient.post(`/auth/forgot-password/reset`, data);
+  logout: async (): Promise<void> => {
+    await client.post('/auth/logout');
+  },
+
+  getMyCompanies: async (): Promise<Company[]> => {
+    const response = await client.get<Company[]>('/me/companies');
     return response.data;
-  }
+  },
 };

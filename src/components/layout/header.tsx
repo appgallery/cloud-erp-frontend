@@ -26,8 +26,14 @@ export function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     setUserMenuOpen(false);
+    try {
+      const { authApi } = await import("@/lib/api/auth/auth");
+      await authApi.logout();
+    } catch {
+      // Ignore network failures on sign out
+    }
     logout();
     router.push("/login");
   };

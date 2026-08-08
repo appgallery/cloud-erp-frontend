@@ -12,17 +12,17 @@ import { toast } from "sonner";
 
 export function SigninForm() {
   const router = useRouter();
-  const { login, isAuthenticated } = useAuthStore();
+  const { setAuth, isAuthenticated } = useAuthStore();
   const [data, setData] = useState({
-    email: "admin@clouderp.com",
-    password: "••••••••",
+    email: "",
+    password: "",
     remember: true,
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard");
+      router.push("/dashboard/crm");
     }
   }, [isAuthenticated, router]);
 
@@ -42,18 +42,23 @@ export function SigninForm() {
         throw new Error("Email and password are required");
       }
 
-      // Call the real API endpoint
-      const response = await authApi.login({
+      // Call NestJS login endpoint
+      const tokens = await authApi.login({
         email: data.email,
         password: data.password,
       });
 
-      login(response.user, response.token);
+      // Save tokens, decode JWT claims (sub, tenantId, email), update store
+      setAuth(tokens, { email: data.email });
+
       toast.success("Successfully signed in!");
-      router.push("/dashboard");
+      router.push("/dashboard/crm");
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Sign in failed";
-      toast.error(errorMessage);
+      const errorMessage =
+        err.response?.data?.message || err.message || "Sign in failed";
+      toast.error(
+        Array.isArray(errorMessage) ? errorMessage.join(", ") : errorMessage
+      );
     } finally {
       setLoading(false);
     }
@@ -126,7 +131,10 @@ export function SigninForm() {
       <div className="mt-6 text-center text-sm text-dark-5 dark:text-dark-6">
         <p>
           Don’t have an account?{" "}
-          <Link href="/register" className="text-primary font-medium hover:underline">
+          <Link
+            href="/register"
+            className="text-primary font-medium hover:underline"
+          >
             Sign Up
           </Link>
         </p>

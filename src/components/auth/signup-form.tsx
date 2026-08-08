@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 export function SignupForm() {
   const router = useRouter();
-  const { login, isAuthenticated } = useAuthStore();
+  const { setAuth, isAuthenticated } = useAuthStore();
   const [data, setData] = useState({
     organizationName: "",
     companyName: "",
@@ -24,7 +24,7 @@ export function SignupForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard");
+      router.push("/dashboard/crm");
     }
   }, [isAuthenticated, router]);
 
@@ -50,20 +50,32 @@ export function SignupForm() {
         throw new Error("Organization and Company names are required");
       }
 
-      // Call the real API endpoint
-      const response = await authApi.register({
+      // Call NestJS signup endpoint
+      const response = await authApi.signup({
         organizationName: data.organizationName,
         companyName: data.companyName,
         email: data.email,
         password: data.password,
       });
 
-      login(response.user, response.token);
+      // Save tokens, extract JWT claims, and save company info in state
+      setAuth(
+        response,
+        {
+          email: data.email,
+          companyId: response.companyId,
+          companyName: response.companyName,
+        }
+      );
+
       toast.success("Account created successfully!");
-      router.push("/dashboard");
+      router.push("/dashboard/crm");
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Sign up failed";
-      toast.error(errorMessage);
+      const errorMessage =
+        err.response?.data?.message || err.message || "Sign up failed";
+      toast.error(
+        Array.isArray(errorMessage) ? errorMessage.join(", ") : errorMessage
+      );
     } finally {
       setLoading(false);
     }
@@ -154,7 +166,10 @@ export function SignupForm() {
       <div className="mt-6 text-center text-sm text-dark-5 dark:text-dark-6">
         <p>
           Already have an account?{" "}
-          <Link href="/login" className="text-primary font-medium hover:underline">
+          <Link
+            href="/login"
+            className="text-primary font-medium hover:underline"
+          >
             Sign In
           </Link>
         </p>
