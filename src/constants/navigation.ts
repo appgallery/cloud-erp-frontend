@@ -4,6 +4,7 @@ import {
   ShoppingCart,
   Settings,
   Users,
+  ShieldCheck,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -50,17 +51,22 @@ export const navigation: NavGroup[] = [
     ],
   },
   {
-    group: "SETTINGS",
+    group: "ADMINISTRATION & SECURITY",
     items: [
+      {
+        title: "Roles & Permissions",
+        href: "/dashboard/settings/roles",
+        icon: ShieldCheck,
+      },
+      {
+        title: "User Management",
+        href: "/dashboard/settings/users",
+        icon: Users,
+      },
       {
         title: "System Settings",
         href: "#",
         icon: Settings,
-      },
-      {
-        title: "User Management",
-        href: "#",
-        icon: Users,
       },
     ],
   },

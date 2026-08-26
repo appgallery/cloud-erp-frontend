@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { env } from '@/config/env';
 import { useAuthStore } from '@/store/use-auth-store';
+import { useLoadingStore } from '@/store/use-loading-store';
 import { TokenPair } from './types';
 
 const API_BASE_URL = env.API_URL || 'http://localhost:3000/v1';
@@ -31,22 +32,33 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Request Interceptor to attach JWT access token dynamically
+// Request Interceptor to attach JWT access token dynamically and trigger global loader
 client.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig & { skipGlobalLoading?: boolean }) => {
+    if (!config.skipGlobalLoading) {
+      useLoadingStore.getState().showLoader();
+    }
+
     const accessToken = useAuthStore.getState().accessToken;
     if (accessToken && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
-  (error: AxiosError) => Promise.reject(error)
+  (error: AxiosError) => {
+    useLoadingStore.getState().hideLoader();
+    return Promise.reject(error);
+  }
 );
 
-// Response Interceptor for handling 401 Unauthorized and auto refreshing tokens
+// Response Interceptor for handling 401 Unauthorized, token refresh and global loading status
 client.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    useLoadingStore.getState().hideLoader();
+    return response;
+  },
   async (error: AxiosError) => {
+    useLoadingStore.getState().hideLoader();
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
     // Pass through if error is not 401 or request was already retried or auth attempt
