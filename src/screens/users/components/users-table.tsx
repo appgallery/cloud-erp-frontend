@@ -54,7 +54,7 @@ export function UsersTable({
   return (
     <div className="space-y-4">
       {/* Desktop Table View (md and above) */}
-      <div className="hidden md:block overflow-hidden rounded-2xl border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark">
+      <div className="hidden md:block overflow-hidden bg-white dark:bg-gray-dark">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-gray-2 text-dark-5 dark:bg-dark-2 dark:text-dark-6 uppercase font-bold text-[10px] tracking-wider">

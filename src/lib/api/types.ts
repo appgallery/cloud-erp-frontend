@@ -185,3 +185,184 @@ export interface CreateCompanyUserDto {
   roleId?: string;
 }
 
+export interface CreateCompanyDto {
+  name: string;
+  code: string;
+  baseCurrency?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  taxId?: string;
+  timezone?: string;
+}
+
+export interface UpdateCompanyDto {
+  name?: string;
+  baseCurrency?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  taxId?: string;
+  timezone?: string;
+}
+
+export interface ListCompaniesQueryDto {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: 'name' | 'code' | 'createdAt' | 'updatedAt';
+  sortDir?: 'asc' | 'desc';
+  isActive?: boolean;
+}
+
+export interface CompanyDto {
+  id: string;
+  tenantId: string;
+  organizationId: string;
+  name: string;
+  code: string;
+  baseCurrency: string;
+  isActive: boolean;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  postalCode?: string | null;
+  taxId?: string | null;
+  timezone?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateRegionDto {
+  name: string;
+  code: string;
+  parentId?: string;
+}
+
+export interface UpdateRegionDto {
+  name?: string;
+  parentId?: string | null;
+  isActive?: boolean;
+}
+
+export interface ListRegionsQueryDto {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: 'name' | 'code' | 'createdAt' | 'updatedAt';
+  sortDir?: 'asc' | 'desc';
+  isActive?: boolean;
+}
+
+export interface RegionDto {
+  id: string;
+  tenantId: string;
+  companyId: string;
+  name: string;
+  code: string;
+  parentId?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  parent?: {
+    id: string;
+    name: string;
+    code: string;
+  } | null;
+}
+
+export interface RegionTreeNode {
+  id: string;
+  name: string;
+  code: string;
+  parentId: string | null;
+  isActive: boolean;
+  children: RegionTreeNode[];
+}
+
+export type BranchType = 'HEAD_OFFICE' | 'SALES' | 'WAREHOUSE' | 'SERVICE' | 'REMOTE';
+
+export interface CreateBranchDto {
+  name: string;
+  code: string;
+  type?: BranchType;
+  regionId?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  country?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  phone?: string;
+  email?: string;
+}
+
+export interface UpdateBranchDto {
+  name?: string;
+  type?: BranchType;
+  regionId?: string | null;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  phone?: string;
+  email?: string;
+}
+
+export interface ListBranchesQueryDto {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: 'name' | 'code' | 'city' | 'state' | 'createdAt' | 'updatedAt';
+  sortDir?: 'asc' | 'desc';
+  city?: string;
+  state?: string;
+  country?: string;
+  regionId?: string;
+  type?: BranchType;
+  isActive?: boolean;
+}
+
+export interface BranchDto {
+  id: string;
+  tenantId: string;
+  companyId: string;
+  regionId?: string | null;
+  name: string;
+  code: string;
+  type: BranchType;
+  isActive: boolean;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city: string;
+  state: string;
+  country: string;
+  postalCode?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  phone?: string | null;
+  email?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  region?: {
+    id: string;
+    name: string;
+    code: string;
+  } | null;
+}
+
+

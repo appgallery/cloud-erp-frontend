@@ -8,6 +8,7 @@ import { CompanyUserDto, RoleDto, CreateCompanyUserDto } from "@/lib/api/types";
 import { UsersTable } from "./components/users-table";
 import { AddUserModal } from "./components/add-user-modal";
 import { AssignRoleModal } from "./components/assign-role-modal";
+import { Pagination } from "@/components/common/pagination";
 import {
   Users,
   UserPlus,
@@ -16,7 +17,6 @@ import {
   UserCheck,
   Shield,
   Lock,
-  CheckCircle,
   TrendingUp,
   RefreshCw,
 } from "lucide-react";
@@ -29,6 +29,9 @@ export function UsersScreen() {
   const [roles, setRoles] = useState<RoleDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [totalItems, setTotalItems] = useState(0);
 
   // Modals
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
@@ -42,17 +45,22 @@ export function UsersScreen() {
     setLoading(true);
     try {
       const [usersRes, rolesRes] = await Promise.all([
-        usersApi.listCompanyUsers(activeCompanyId, { pageSize: 100 }),
+        usersApi.listCompanyUsers(activeCompanyId, {
+          page,
+          pageSize,
+          search: searchTerm || undefined,
+        }),
         rolesApi.listRoles(activeCompanyId, { includeArchived: false, pageSize: 100 }),
       ]);
       setUsers(usersRes.items || []);
+      setTotalItems(usersRes.total || 0);
       setRoles(rolesRes.items || []);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to load users");
     } finally {
       setLoading(false);
     }
-  }, [activeCompanyId]);
+  }, [activeCompanyId, page, pageSize, searchTerm]);
 
   useEffect(() => {
     if (!activeCompanyId) {
@@ -107,7 +115,6 @@ export function UsersScreen() {
     }
   };
 
-  // Calculated Stats (CRM Style Overview)
   const activeCount = users.filter((u) => u.isActive).length;
   const rolesAssignedCount = users.reduce((acc, u) => {
     const rCount = u.roles?.length || (u.roleId ? 1 : 0);
@@ -117,25 +124,22 @@ export function UsersScreen() {
   const stats = [
     {
       title: "Total Company Users",
-      value: users.length.toString(),
-      change: "+12.4%",
-      isUp: true,
+      value: totalItems.toString(),
+      change: "Active Roster",
       icon: Users,
       color: "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
     },
     {
-      title: "Active Roster",
-      value: activeCount.toString(),
-      change: "+100%",
-      isUp: true,
+      title: "Active Users",
+      value: `${activeCount} / ${users.length}`,
+      change: "Operational",
       icon: UserCheck,
       color: "bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400",
     },
     {
       title: "Active Role Grants",
       value: rolesAssignedCount.toString(),
-      change: "+8.5%",
-      isUp: true,
+      change: "Assigned Grants",
       icon: Shield,
       color: "bg-purple-50 text-primary dark:bg-purple-950/40 dark:text-purple-400",
     },
@@ -143,7 +147,6 @@ export function UsersScreen() {
       title: "Security & Policy",
       value: "Compliant",
       change: "100%",
-      isUp: true,
       icon: Lock,
       color: "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
     },
@@ -193,7 +196,7 @@ export function UsersScreen() {
           return (
             <div
               key={idx}
-              className="rounded-2xl border border-stroke bg-white p-5 shadow-1 dark:border-dark-3 dark:bg-gray-dark"
+              className="rounded-2xl border border-stroke bg-white p-5 shadow-1 dark:border-dark-3 dark:bg-gray-dark transition hover:border-primary/50"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-dark-5 dark:text-dark-6">
@@ -218,32 +221,51 @@ export function UsersScreen() {
         })}
       </div>
 
-      {/* Filter / Search Bar */}
-      <div className="rounded-2xl border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-5" />
-          <input
-            type="text"
-            placeholder="Search company users by email address..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 pl-10 pr-4 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-          />
+      {/* Main Table Card Container (Filters + Table + Embedded Footer Pagination) */}
+      <div className="rounded-2xl border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark overflow-hidden">
+        {/* Filter / Search Bar */}
+        <div className="p-5 border-b border-stroke dark:border-dark-3 bg-white dark:bg-gray-dark">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-5" />
+            <input
+              type="text"
+              placeholder="Search company users by email address..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 pl-10 pr-4 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Users Table / Mobile Cards */}
-      <UsersTable
-        users={users}
-        roles={roles}
-        loading={loading}
-        searchTerm={searchTerm}
-        onOpenAssignModal={(user) => {
-          setSelectedUser(user);
-          setIsAssignModalOpen(true);
-        }}
-        onRemoveRole={handleRemoveRole}
-      />
+        {/* Users Table / Mobile Cards */}
+        <UsersTable
+          users={users}
+          roles={roles}
+          loading={loading}
+          searchTerm={searchTerm}
+          onOpenAssignModal={(user) => {
+            setSelectedUser(user);
+            setIsAssignModalOpen(true);
+          }}
+          onRemoveRole={handleRemoveRole}
+        />
+
+        {/* Embedded Pagination in Table Card Footer */}
+        <Pagination
+          embedded
+          currentPage={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={setPage}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setPage(1);
+          }}
+        />
+      </div>
 
       {/* Modals */}
       <AddUserModal

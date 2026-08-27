@@ -8,7 +8,7 @@ import {
 export const usersApi = {
   listCompanyUsers: async (
     companyId: string,
-    params?: { page?: number; pageSize?: number }
+    params?: { page?: number; pageSize?: number; search?: string }
   ): Promise<PaginatedResponse<CompanyUserDto>> => {
     const response = await client.get<PaginatedResponse<CompanyUserDto>>(
       `/companies/${companyId}/users`,

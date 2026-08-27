@@ -5,6 +5,9 @@ import {
   Settings,
   Users,
   ShieldCheck,
+  Building2,
+  Map,
+  Building,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -38,15 +41,25 @@ export const navigation: NavGroup[] = [
           { title: "Analytics", href: "#" },
         ],
       },
+    ],
+  },
+  {
+    group: "ORGANIZATION & STRUCTURE",
+    items: [
       {
-        title: "Inventory",
-        href: "#",
-        icon: Package,
+        title: "Companies",
+        href: "/dashboard/organization/companies",
+        icon: Building2,
       },
       {
-        title: "Sales",
-        href: "#",
-        icon: ShoppingCart,
+        title: "Regions",
+        href: "/dashboard/organization/regions",
+        icon: Map,
+      },
+      {
+        title: "Branches",
+        href: "/dashboard/organization/branches",
+        icon: Building,
       },
     ],
   },
@@ -63,11 +76,7 @@ export const navigation: NavGroup[] = [
         href: "/dashboard/settings/users",
         icon: Users,
       },
-      {
-        title: "System Settings",
-        href: "#",
-        icon: Settings,
-      },
+
     ],
   },
 ];

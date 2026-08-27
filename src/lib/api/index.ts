@@ -4,3 +4,6 @@ export * from './auth/auth';
 export * from './roles/roles';
 export * from './permissions/permissions';
 export * from './users/users';
+export * from './companies/companies';
+export * from './regions/regions';
+export * from './branches/branches';
