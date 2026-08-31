@@ -180,10 +180,9 @@ export interface CompanyUserDto {
 
 export interface CreateCompanyUserDto {
   email: string;
-  password?: string;
-  name?: string;
   roleId?: string;
 }
+
 
 export interface CreateCompanyDto {
   name: string;
@@ -288,7 +287,7 @@ export interface RegionTreeNode {
   children: RegionTreeNode[];
 }
 
-export type BranchType = 'HEAD_OFFICE' | 'SALES' | 'WAREHOUSE' | 'SERVICE' | 'REMOTE';
+export type BranchType = 'HEAD_OFFICE' | 'SALES' | 'WAREHOUSE' | 'SERVICE_CENTER' | 'FACTORY';
 
 export interface CreateBranchDto {
   name: string;
@@ -364,5 +363,81 @@ export interface BranchDto {
     code: string;
   } | null;
 }
+
+export interface ForgotPasswordDto {
+  email: string;
+}
+
+export interface ResetPasswordDto {
+  token: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface DepartmentDto {
+  id: string;
+  tenantId: string;
+  companyId: string;
+  branchId: string;
+  name: string;
+  code: string;
+  parentId?: string | null;
+  headUserId?: string | null;
+  description?: string | null;
+  isActive: boolean;
+  deletedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  headUser?: {
+    id: string;
+    email: string;
+  } | null;
+  parent?: {
+    id: string;
+    name: string;
+    code: string;
+  } | null;
+}
+
+export interface DepartmentTreeNode {
+  id: string;
+  name: string;
+  code: string;
+  parentId: string | null;
+  isActive: boolean;
+  headUserId: string | null;
+  children: DepartmentTreeNode[];
+}
+
+export interface CreateDepartmentDto {
+  name: string;
+  code: string;
+  parentId?: string;
+  headUserId?: string;
+  description?: string;
+}
+
+export interface UpdateDepartmentDto {
+  name?: string;
+  parentId?: string | null;
+  headUserId?: string | null;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface ListDepartmentsQueryDto {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: 'name' | 'code' | 'createdAt' | 'updatedAt';
+  sortDir?: 'asc' | 'desc';
+  parentId?: string;
+  isActive?: boolean;
+}
+
 
 

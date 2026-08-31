@@ -16,7 +16,8 @@ import {
   Building2,
   UserCheck,
   Shield,
-  Lock,
+  Filter,
+  ChevronDown,
   TrendingUp,
   RefreshCw,
 } from "lucide-react";
@@ -29,15 +30,17 @@ export function UsersScreen() {
   const [roles, setRoles] = useState<RoleDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive" | "unassigned">("all");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Modals
+  // Modals & Action States
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<CompanyUserDto | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   // Load Data
   const loadData = useCallback(async () => {
@@ -49,6 +52,8 @@ export function UsersScreen() {
           page,
           pageSize,
           search: searchTerm || undefined,
+          isActive: statusFilter === "active" ? true : statusFilter === "inactive" ? false : undefined,
+          unassignedOnly: statusFilter === "unassigned" ? true : undefined,
         }),
         rolesApi.listRoles(activeCompanyId, { includeArchived: false, pageSize: 100 }),
       ]);
@@ -60,7 +65,7 @@ export function UsersScreen() {
     } finally {
       setLoading(false);
     }
-  }, [activeCompanyId, page, pageSize, searchTerm]);
+  }, [activeCompanyId, page, pageSize, searchTerm, statusFilter]);
 
   useEffect(() => {
     if (!activeCompanyId) {
@@ -70,19 +75,39 @@ export function UsersScreen() {
     }
   }, [activeCompanyId, fetchMyCompanies, loadData]);
 
-  // Create User
+  // Create User (Send Invite)
   const handleCreateUser = async (form: CreateCompanyUserDto) => {
     if (!activeCompanyId) return;
     setIsSubmitting(true);
     try {
       await usersApi.createCompanyUser(activeCompanyId, form);
-      toast.success(`User ${form.email} created successfully`);
+      toast.success(`Invitation dispatched to ${form.email}`);
       setIsAddUserModalOpen(false);
       await loadData();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to create user");
+      toast.error(err.response?.data?.message || "Failed to invite user");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Toggle Active / Deactivate User
+  const handleToggleActive = async (user: CompanyUserDto) => {
+    if (!activeCompanyId) return;
+    setTogglingId(user.id);
+    try {
+      if (user.isActive) {
+        await usersApi.deactivateUser(activeCompanyId, user.id);
+        toast.success(`User ${user.email} deactivated`);
+      } else {
+        await usersApi.activateUser(activeCompanyId, user.id);
+        toast.success(`User ${user.email} activated`);
+      }
+      await loadData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to update user status");
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -139,16 +164,9 @@ export function UsersScreen() {
     {
       title: "Active Role Grants",
       value: rolesAssignedCount.toString(),
-      change: "Assigned Grants",
+      change: "Security Roles",
       icon: Shield,
       color: "bg-purple-50 text-primary dark:bg-purple-950/40 dark:text-purple-400",
-    },
-    {
-      title: "Security & Policy",
-      value: "Compliant",
-      change: "100%",
-      icon: Lock,
-      color: "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
     },
   ];
 
@@ -162,11 +180,10 @@ export function UsersScreen() {
             <span>Company Context: {activeCompanyName || "Default Company"}</span>
           </div>
           <h1 className="text-2xl font-bold text-dark dark:text-white flex items-center gap-2.5 tracking-tight">
-            <Users className="h-7 w-7 text-primary" />
             User Administration & Access Roster
           </h1>
           <p className="text-xs text-dark-5 dark:text-dark-6 mt-1">
-            Manage company team members, grant security roles, and monitor organizational access controls.
+            Manage company team members, invite new colleagues, and assign security roles.
           </p>
         </div>
 
@@ -184,13 +201,13 @@ export function UsersScreen() {
             className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-primary/90"
           >
             <UserPlus className="h-4 w-4" />
-            Add Company User
+            Invite User
           </button>
         </div>
       </div>
 
-      {/* CRM Style Overview Stats Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Overview Stats Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {stats.map((stat, idx) => {
           const Icon = stat.icon;
           return (
@@ -224,8 +241,8 @@ export function UsersScreen() {
       {/* Main Table Card Container (Filters + Table + Embedded Footer Pagination) */}
       <div className="rounded-2xl border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark overflow-hidden">
         {/* Filter / Search Bar */}
-        <div className="p-5 border-b border-stroke dark:border-dark-3 bg-white dark:bg-gray-dark">
-          <div className="relative max-w-md">
+        <div className="flex flex-col gap-3 p-5 border-b border-stroke dark:border-dark-3 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-dark">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-5" />
             <input
               type="text"
@@ -238,12 +255,31 @@ export function UsersScreen() {
               className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 pl-10 pr-4 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
             />
           </div>
+
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value as any);
+                  setPage(1);
+                }}
+                className="appearance-none rounded-xl border border-stroke bg-gray-2 py-2.5 pl-9 pr-9 text-xs font-semibold text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white cursor-pointer transition"
+              >
+                <option value="all">All Members</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Inactive Only</option>
+                <option value="unassigned">Unassigned Roles Only</option>
+              </select>
+              <Filter className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
+            </div>
+          </div>
         </div>
 
-        {/* Users Table / Mobile Cards */}
+        {/* Users Table */}
         <UsersTable
           users={users}
-          roles={roles}
           loading={loading}
           searchTerm={searchTerm}
           onOpenAssignModal={(user) => {
@@ -251,6 +287,8 @@ export function UsersScreen() {
             setIsAssignModalOpen(true);
           }}
           onRemoveRole={handleRemoveRole}
+          onToggleActive={handleToggleActive}
+          togglingId={togglingId}
         />
 
         {/* Embedded Pagination in Table Card Footer */}

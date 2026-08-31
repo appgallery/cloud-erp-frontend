@@ -7,3 +7,4 @@ export * from './users/users';
 export * from './companies/companies';
 export * from './regions/regions';
 export * from './branches/branches';
+export * from './departments/departments';

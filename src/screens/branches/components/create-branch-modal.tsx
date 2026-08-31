@@ -16,8 +16,8 @@ const BRANCH_TYPES: { label: string; value: BranchType }[] = [
   { label: "Head Office", value: "HEAD_OFFICE" },
   { label: "Sales Office", value: "SALES" },
   { label: "Warehouse", value: "WAREHOUSE" },
-  { label: "Service Center", value: "SERVICE" },
-  { label: "Remote Location", value: "REMOTE" },
+  { label: "Service Center", value: "SERVICE_CENTER" },
+  { label: "Factory", value: "FACTORY" },
 ];
 
 export function CreateBranchModal({

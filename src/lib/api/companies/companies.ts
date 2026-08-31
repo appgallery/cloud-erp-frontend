@@ -23,10 +23,16 @@ export const companiesApi = {
     return response.data;
   },
 
-  createCompany: async (dto: CreateCompanyDto): Promise<CompanyDto> => {
-    const response = await apiClient.post<CompanyDto>('/companies', dto);
+  createCompany: async (
+    actingCompanyId: string,
+    dto: CreateCompanyDto
+  ): Promise<CompanyDto> => {
+    const response = await apiClient.post<CompanyDto>('/companies', dto, {
+      params: { companyId: actingCompanyId },
+    });
     return response.data;
   },
+
 
   getCompany: async (companyId: string): Promise<CompanyDto> => {
     const response = await apiClient.get<CompanyDto>(`/companies/${companyId}`);

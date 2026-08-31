@@ -43,13 +43,13 @@ const TYPE_BADGES: Record<BranchType, { label: string; style: string }> = {
     label: "Warehouse",
     style: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800",
   },
-  SERVICE: {
+  SERVICE_CENTER: {
     label: "Service Center",
     style: "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800",
   },
-  REMOTE: {
-    label: "Remote Office",
-    style: "bg-gray-2 text-dark-5 border-stroke dark:bg-dark-2 dark:text-dark-6 dark:border-dark-3",
+  FACTORY: {
+    label: "Factory",
+    style: "bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800",
   },
 };
 
@@ -317,8 +317,8 @@ export function BranchesScreen() {
                 <option value="HEAD_OFFICE">Head Office</option>
                 <option value="SALES">Sales Office</option>
                 <option value="WAREHOUSE">Warehouse</option>
-                <option value="SERVICE">Service Center</option>
-                <option value="REMOTE">Remote Office</option>
+                <option value="SERVICE_CENTER">Service Center</option>
+                <option value="FACTORY">Factory</option>
               </select>
               <Filter className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
               <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />

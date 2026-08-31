@@ -6,6 +6,9 @@ import {
   TokenPair,
   SignupResponse,
   Company,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  ChangePasswordDto,
 } from '../types';
 
 export const authApi = {
@@ -26,6 +29,18 @@ export const authApi = {
 
   logout: async (): Promise<void> => {
     await client.post('/auth/logout');
+  },
+
+  forgotPassword: async (data: ForgotPasswordDto): Promise<void> => {
+    await client.post('/auth/forgot-password', data);
+  },
+
+  resetPassword: async (data: ResetPasswordDto): Promise<void> => {
+    await client.post('/auth/reset-password', data);
+  },
+
+  changePassword: async (data: ChangePasswordDto): Promise<void> => {
+    await client.post('/auth/change-password', data);
   },
 
   getMyCompanies: async (): Promise<Company[]> => {

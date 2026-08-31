@@ -105,9 +105,13 @@ export function CompaniesScreen() {
   };
 
   const handleCreateCompany = async (dto: CreateCompanyDto) => {
+    if (!activeCompanyId) {
+      toast.error("Active company context required to perform this action");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await companiesApi.createCompany(dto);
+      await companiesApi.createCompany(activeCompanyId, dto);
       toast.success(`Company "${dto.name}" created successfully`);
       setIsCreateModalOpen(false);
       await fetchMyCompanies();

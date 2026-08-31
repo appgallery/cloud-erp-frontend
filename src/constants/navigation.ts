@@ -1,13 +1,11 @@
 import {
   LayoutDashboard,
-  Package,
-  ShoppingCart,
-  Settings,
   Users,
   ShieldCheck,
   Building2,
   Map,
   Building,
+  FolderTree,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -61,6 +59,11 @@ export const navigation: NavGroup[] = [
         href: "/dashboard/organization/branches",
         icon: Building,
       },
+      {
+        title: "Departments",
+        href: "/dashboard/organization/departments",
+        icon: FolderTree,
+      },
     ],
   },
   {
@@ -76,7 +79,6 @@ export const navigation: NavGroup[] = [
         href: "/dashboard/settings/users",
         icon: Users,
       },
-
     ],
   },
 ];
