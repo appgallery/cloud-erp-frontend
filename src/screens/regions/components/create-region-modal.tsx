@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { CreateRegionDto, RegionDto } from "@/lib/api/types";
 import { X, Map, Hash, GitBranch } from "lucide-react";
+import { CustomSelect } from "@/components/forms/select";
 
 interface CreateRegionModalProps {
   isOpen: boolean;
@@ -26,6 +27,14 @@ export function CreateRegionModal({
   });
 
   if (!isOpen) return null;
+
+  const parentOptions = [
+    { value: "", label: "(None - Top Level Region)" },
+    ...regionsList.map((reg) => ({
+      value: reg.id,
+      label: `${reg.name} (${reg.code})`,
+    })),
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +64,7 @@ export function CreateRegionModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white transition"
+            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white transition cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -74,7 +83,7 @@ export function CreateRegionModal({
               placeholder="e.g. North America, West Coast, South Zone"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
             />
           </div>
 
@@ -92,7 +101,7 @@ export function CreateRegionModal({
                 onChange={(e) =>
                   setFormData({ ...formData, code: e.target.value.toUpperCase() })
                 }
-                className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark font-mono uppercase focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark font-mono uppercase focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
               />
               <Hash className="absolute right-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
             </div>
@@ -103,23 +112,14 @@ export function CreateRegionModal({
 
           {/* Parent Region */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-dark dark:text-white flex items-center gap-1">
-              <GitBranch className="h-3.5 w-3.5 text-primary" /> Parent Region (Optional Hierarchy)
-            </label>
-            <select
+            <CustomSelect
+              label="Parent Region (Optional Hierarchy)"
+              placeholder="Select parent region..."
               value={formData.parentId || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, parentId: e.target.value || undefined })
-              }
-              className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            >
-              <option value="">(None - Top Level Region)</option>
-              {regionsList.map((reg) => (
-                <option key={reg.id} value={reg.id}>
-                  {reg.name} ({reg.code})
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setFormData({ ...formData, parentId: val || undefined })}
+              options={parentOptions}
+              icon={<GitBranch className="h-3.5 w-3.5 text-primary" />}
+            />
           </div>
 
           {/* Footer Actions */}
@@ -127,14 +127,14 @@ export function CreateRegionModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
+              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition"
+              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition cursor-pointer"
             >
               {isSubmitting ? "Creating..." : "Create Region"}
             </button>

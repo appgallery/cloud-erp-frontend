@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { BranchDto, UpdateBranchDto, BranchType, RegionDto } from "@/lib/api/types";
 import { X, Building, MapPin, Phone, Mail, Map, Lock } from "lucide-react";
+import { CustomSelect } from "@/components/forms/select";
 
 interface EditBranchModalProps {
   isOpen: boolean;
@@ -51,6 +52,14 @@ export function EditBranchModal({
 
   if (!isOpen || !branch) return null;
 
+  const regionOptions = [
+    { value: "", label: "(Unassigned - None)" },
+    ...regionsList.map((r) => ({
+      value: r.id,
+      label: `${r.name} (${r.code})`,
+    })),
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit(branch.id, formData);
@@ -74,7 +83,7 @@ export function EditBranchModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white transition"
+            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white transition cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -112,43 +121,24 @@ export function EditBranchModal({
 
             {/* Branch Type */}
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-dark dark:text-white">
-                Branch Type
-              </label>
-              <select
+              <CustomSelect
+                label="Branch Type"
                 value={formData.type || "SALES"}
-                onChange={(e) =>
-                  setFormData({ ...formData, type: e.target.value as BranchType })
-                }
-                className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              >
-                {BRANCH_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFormData({ ...formData, type: val as BranchType })}
+                options={BRANCH_TYPES}
+              />
             </div>
 
             {/* Region Selection */}
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-dark dark:text-white flex items-center gap-1">
-                <Map className="h-3.5 w-3.5 text-primary" /> Region Association
-              </label>
-              <select
+              <CustomSelect
+                label="Region Association"
+                placeholder="Select Region..."
                 value={formData.regionId || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, regionId: e.target.value || null })
-                }
-                className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              >
-                <option value="">(Unassigned)</option>
-                {regionsList.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name} ({r.code})
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFormData({ ...formData, regionId: val || null })}
+                options={regionOptions}
+                icon={<Map className="h-3.5 w-3.5 text-primary" />}
+              />
             </div>
           </div>
 
@@ -256,14 +246,14 @@ export function EditBranchModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
+              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition"
+              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition cursor-pointer"
             >
               {isSubmitting ? "Saving..." : "Save Changes"}
             </button>

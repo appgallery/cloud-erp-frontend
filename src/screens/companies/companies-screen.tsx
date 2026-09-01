@@ -24,11 +24,13 @@ import {
   ArrowDown,
   ChevronDown,
   Filter,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
+import { NativeSelect } from "@/components/forms/select";
 
 export function CompaniesScreen() {
-  const { activeCompanyId, fetchMyCompanies } = useAuthStore();
+  const { activeCompanyId, fetchMyCompanies, setActiveCompany } = useAuthStore();
 
   const [companies, setCompanies] = useState<CompanyDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,7 +168,7 @@ export function CompaniesScreen() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className="space-y-6">
       {/* Top Banner Header */}
       <div className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-1 dark:bg-gray-dark border border-stroke dark:border-dark-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -251,33 +253,31 @@ export function CompaniesScreen() {
 
           {/* Status Select Filter */}
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <select
+            <div className="w-36">
+              <NativeSelect
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value);
                   setPage(1);
                 }}
-                className="appearance-none rounded-xl border border-stroke bg-gray-2 py-2.5 pl-9 pr-9 text-xs font-semibold text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white cursor-pointer transition"
+                icon={<Filter className="h-3.5 w-3.5" />}
               >
                 <option value="all">All Statuses</option>
                 <option value="active">Active Only</option>
                 <option value="inactive">Inactive Only</option>
-              </select>
-              <Filter className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
+              </NativeSelect>
             </div>
           </div>
         </div>
 
         {/* Data Table */}
         <div className="max-w-full overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full min-w-[700px] text-left border-collapse">
             <thead>
               <tr className="border-b border-stroke bg-gray-2/60 dark:border-dark-3 dark:bg-dark-2/60">
                 <th
                   onClick={() => handleSort("name")}
-                  className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white cursor-pointer select-none group"
+                  className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white cursor-pointer select-none group whitespace-nowrap"
                 >
                   <div className="flex items-center gap-2">
                     <span>Company Entity</span>
@@ -286,26 +286,26 @@ export function CompaniesScreen() {
                 </th>
                 <th
                   onClick={() => handleSort("code")}
-                  className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white cursor-pointer select-none group"
+                  className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white cursor-pointer select-none group whitespace-nowrap"
                 >
                   <div className="flex items-center gap-2">
                     <span>Code</span>
                     {renderSortIcon("code")}
                   </div>
                 </th>
-                <th className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white">
+                <th className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white whitespace-nowrap">
                   Base Currency
                 </th>
-                <th className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white">
+                <th className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white whitespace-nowrap">
                   Location / Tax ID
                 </th>
-                <th className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white">
+                <th className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white whitespace-nowrap">
                   Timezone
                 </th>
-                <th className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white">
+                <th className="py-3.5 px-5 text-xs font-bold text-dark dark:text-white whitespace-nowrap">
                   Status
                 </th>
-                <th className="py-3.5 px-5 text-right text-xs font-bold text-dark dark:text-white">
+                <th className="py-3.5 px-5 text-right text-xs font-bold text-dark dark:text-white whitespace-nowrap">
                   Actions
                 </th>
               </tr>

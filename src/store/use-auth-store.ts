@@ -99,11 +99,19 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setActiveCompany: (companyId: string, companyName?: string) => {
-        set((state) => ({
-          activeCompanyId: companyId,
-          activeCompanyName: companyName || state.activeCompanyName,
-          user: state.user ? { ...state.user, companyId, companyName: companyName || state.user.companyName } : null,
-        }));
+        set((state) => {
+          const resolvedName =
+            companyName ||
+            state.companies.find((c) => c.companyId === companyId)?.companyName ||
+            state.activeCompanyName;
+          return {
+            activeCompanyId: companyId,
+            activeCompanyName: resolvedName,
+            user: state.user
+              ? { ...state.user, companyId, companyName: resolvedName || state.user.companyName }
+              : null,
+          };
+        });
       },
 
       fetchMyCompanies: async (): Promise<MyCompanyEntry[]> => {

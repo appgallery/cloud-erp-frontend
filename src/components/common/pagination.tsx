@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { NativeSelect } from "@/components/forms/select";
 
 interface PaginationProps {
   currentPage: number;
@@ -71,19 +72,18 @@ export function Pagination({
         {onPageSizeChange && (
           <div className="flex items-center gap-2">
             <span>Per page:</span>
-            <div className="relative">
-              <select
+            <div className="w-20">
+              <NativeSelect
+                size="sm"
                 value={pageSize}
                 onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                className="appearance-none rounded-xl border border-stroke bg-gray-2 py-1 pl-3 pr-7 text-xs font-semibold text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white transition cursor-pointer"
               >
                 {pageSizeOptions.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt}
                   </option>
                 ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
+              </NativeSelect>
             </div>
           </div>
         )}
@@ -96,7 +96,7 @@ export function Pagination({
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
           title="First Page"
-          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke bg-white text-dark hover:bg-gray-2 disabled:opacity-40 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 transition shadow-xs"
+          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke bg-white text-dark hover:bg-gray-2 disabled:opacity-40 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 transition shadow-xs cursor-pointer"
         >
           <ChevronsLeft className="h-4 w-4" />
         </button>
@@ -106,7 +106,7 @@ export function Pagination({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           title="Previous Page"
-          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke bg-white text-dark hover:bg-gray-2 disabled:opacity-40 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 transition shadow-xs"
+          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke bg-white text-dark hover:bg-gray-2 disabled:opacity-40 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 transition shadow-xs cursor-pointer"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -132,7 +132,7 @@ export function Pagination({
               <button
                 key={pageNum}
                 onClick={() => onPageChange(pageNum)}
-                className={`flex h-8 min-w-8 items-center justify-center rounded-xl px-2.5 text-xs font-bold transition shadow-xs ${
+                className={`flex h-8 min-w-8 items-center justify-center rounded-xl px-2.5 text-xs font-bold transition shadow-xs cursor-pointer ${
                   isActive
                     ? "bg-primary text-white"
                     : "border border-stroke bg-white text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
@@ -149,7 +149,7 @@ export function Pagination({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
           title="Next Page"
-          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke bg-white text-dark hover:bg-gray-2 disabled:opacity-40 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 transition shadow-xs"
+          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke bg-white text-dark hover:bg-gray-2 disabled:opacity-40 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 transition shadow-xs cursor-pointer"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -159,7 +159,7 @@ export function Pagination({
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage >= totalPages}
           title="Last Page"
-          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke bg-white text-dark hover:bg-gray-2 disabled:opacity-40 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 transition shadow-xs"
+          className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke bg-white text-dark hover:bg-gray-2 disabled:opacity-40 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 transition shadow-xs cursor-pointer"
         >
           <ChevronsRight className="h-4 w-4" />
         </button>

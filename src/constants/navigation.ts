@@ -36,7 +36,6 @@ export const navigation: NavGroup[] = [
         icon: LayoutDashboard,
         items: [
           { title: "CRM Overview", href: "/dashboard/crm" },
-          { title: "Analytics", href: "#" },
         ],
       },
     ],

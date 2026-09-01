@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { CompanyUserDto, RoleDto } from "@/lib/api/types";
 import { X, Shield } from "lucide-react";
+import { CustomSelect } from "@/components/forms/select";
 
 interface AssignRoleModalProps {
   isOpen: boolean;
@@ -25,6 +26,12 @@ export function AssignRoleModal({
 
   if (!isOpen || !user) return null;
 
+  const roleOptions = roles.map((r) => ({
+    value: r.id,
+    label: r.name,
+    badge: r.isTemplate ? "Template" : undefined,
+  }));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRoleId) return;
@@ -33,59 +40,55 @@ export function AssignRoleModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark/50 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2 dark:bg-gray-dark border border-stroke dark:border-dark-3 animate-in fade-in zoom-in-95 duration-150">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-bold text-dark dark:text-white">
-            Assign Role to User
-          </h3>
+        <div className="flex items-center justify-between pb-4 border-b border-stroke dark:border-dark-3">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Shield className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-dark dark:text-white">
+                Assign Role to User
+              </h3>
+              <p className="text-xs text-dark-5 dark:text-dark-6">
+                Change permission profile for <strong className="text-dark dark:text-white">{user.email}</strong>.
+              </p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-dark-5 hover:bg-gray-2 dark:hover:bg-dark-3"
+            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 dark:hover:bg-dark-3 dark:text-dark-6 dark:hover:text-white transition cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <p className="text-xs text-dark-5 mb-4">
-          Select a security role to assign to <strong className="text-dark dark:text-white">{user.email}</strong>.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-semibold text-dark dark:text-white">
-              Select Role *
-            </label>
-            <div className="relative">
-              <Shield className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-5" />
-              <select
-                required
-                value={selectedRoleId}
-                onChange={(e) => setSelectedRoleId(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-gray-2 py-3 pl-9 pr-3 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              >
-                <option value="">Choose role...</option>
-                {roles.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name} {r.isTemplate ? "(Template)" : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <CustomSelect
+              label="Select Security Role"
+              required
+              placeholder="Choose a role..."
+              value={selectedRoleId}
+              onChange={(val) => setSelectedRoleId(val)}
+              options={roleOptions}
+              icon={<Shield className="h-4 w-4" />}
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-stroke dark:border-dark-3">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-stroke px-4 py-2 text-xs font-semibold text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6"
+              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !selectedRoleId}
-              className="rounded-xl bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary/90 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition cursor-pointer"
             >
               {isSubmitting ? "Assigning..." : "Assign Role"}
             </button>

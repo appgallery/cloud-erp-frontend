@@ -5,7 +5,7 @@ import {
   RefreshDto,
   TokenPair,
   SignupResponse,
-  Company,
+  MyCompanyEntry,
   ForgotPasswordDto,
   ResetPasswordDto,
   ChangePasswordDto,
@@ -43,8 +43,8 @@ export const authApi = {
     await client.post('/auth/change-password', data);
   },
 
-  getMyCompanies: async (): Promise<Company[]> => {
-    const response = await client.get<Company[]>('/me/companies');
+  getMyCompanies: async (): Promise<MyCompanyEntry[]> => {
+    const response = await client.get<MyCompanyEntry[]>('/me/companies');
     return response.data;
   },
 };

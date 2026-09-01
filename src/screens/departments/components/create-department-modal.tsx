@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { CreateDepartmentDto, DepartmentDto, CompanyUserDto } from "@/lib/api/types";
 import { X, Hash, User, FolderTree } from "lucide-react";
+import { CustomSelect } from "@/components/forms/select";
 
 interface CreateDepartmentModalProps {
   isOpen: boolean;
@@ -47,6 +48,26 @@ export function CreateDepartmentModal({
 
   if (!isOpen) return null;
 
+  const parentOptions = [
+    { value: "", label: "Top-Level (Root Department)" },
+    ...departments
+      .filter((d) => !d.deletedAt)
+      .map((d) => ({
+        value: d.id,
+        label: `${d.name} (${d.code})`,
+      })),
+  ];
+
+  const headOptions = [
+    { value: "", label: "Unassigned (No head designated)" },
+    ...users
+      .filter((u) => u.isActive)
+      .map((u) => ({
+        value: u.id,
+        label: u.email,
+      })),
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.code.trim()) return;
@@ -80,7 +101,7 @@ export function CreateDepartmentModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white transition"
+            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white transition cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -131,50 +152,24 @@ export function CreateDepartmentModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Parent Department */}
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-dark dark:text-white">
-                Parent Department (Hierarchy)
-              </label>
-              <div className="relative">
-                <select
-                  value={formData.parentId || ""}
-                  onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                  className="w-full appearance-none rounded-xl border border-stroke bg-gray-2 py-2.5 pl-3.5 pr-8 text-xs font-medium text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white cursor-pointer transition"
-                >
-                  <option value="">Top-Level (Root Department)</option>
-                  {departments
-                    .filter((d) => !d.deletedAt)
-                    .map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {d.name} ({d.code})
-                      </option>
-                    ))}
-                </select>
-                <FolderTree className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
-              </div>
+              <CustomSelect
+                label="Parent Department (Hierarchy)"
+                value={formData.parentId || ""}
+                onChange={(val) => setFormData({ ...formData, parentId: val })}
+                options={parentOptions}
+                icon={<FolderTree className="h-3.5 w-3.5 text-primary" />}
+              />
             </div>
 
             {/* Head of Department */}
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-dark dark:text-white">
-                Department Head (Lead)
-              </label>
-              <div className="relative">
-                <select
-                  value={formData.headUserId || ""}
-                  onChange={(e) => setFormData({ ...formData, headUserId: e.target.value })}
-                  className="w-full appearance-none rounded-xl border border-stroke bg-gray-2 py-2.5 pl-3.5 pr-8 text-xs font-medium text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white cursor-pointer transition"
-                >
-                  <option value="">Unassigned (No head designated)</option>
-                  {users
-                    .filter((u) => u.isActive)
-                    .map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.email}
-                      </option>
-                    ))}
-                </select>
-                <User className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
-              </div>
+              <CustomSelect
+                label="Department Head (Lead)"
+                value={formData.headUserId || ""}
+                onChange={(val) => setFormData({ ...formData, headUserId: val })}
+                options={headOptions}
+                icon={<User className="h-3.5 w-3.5 text-primary" />}
+              />
             </div>
           </div>
 

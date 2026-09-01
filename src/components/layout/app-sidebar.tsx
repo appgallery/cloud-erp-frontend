@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navigation } from "@/constants/navigation";
 import { useSidebarContext } from "./sidebar-context";
+import { CompanySwitcher } from "./company-switcher";
 import { X, ChevronRight, ChevronDown } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -34,7 +35,6 @@ export function AppSidebar() {
         }
       });
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   return (
@@ -86,6 +86,14 @@ export function AppSidebar() {
               <X className="h-5 w-5" />
             </button>
           )}
+        </div>
+
+        {/* Active Company — compact switcher (shown in sidebar on all sizes) */}
+        <div className="border-b border-stroke px-4 py-3 dark:border-dark-3 md:hidden">
+          <p className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wider text-dark-5 dark:text-dark-6">
+            Active Company
+          </p>
+          <CompanySwitcher compact />
         </div>
 
         {/* Navigation Menu */}

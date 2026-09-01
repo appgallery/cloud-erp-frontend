@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { CreateCompanyUserDto, RoleDto } from "@/lib/api/types";
 import { X, Mail, Shield, UserPlus, Info } from "lucide-react";
+import { CustomSelect } from "@/components/forms/select";
 
 interface AddUserModalProps {
   isOpen: boolean;
@@ -25,6 +26,15 @@ export function AddUserModal({
   });
 
   if (!isOpen) return null;
+
+  const roleOptions = [
+    { value: "", label: "No initial role (assign later)" },
+    ...roles.map((r) => ({
+      value: r.id,
+      label: r.name,
+      badge: r.isTemplate ? "Template" : undefined,
+    })),
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +65,7 @@ export function AddUserModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:hover:bg-dark-3 dark:text-dark-6 dark:hover:text-white transition"
+            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:hover:bg-dark-3 dark:text-dark-6 dark:hover:text-white transition cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -80,24 +90,14 @@ export function AddUserModal({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-dark dark:text-white">
-              Role Assignment (Optional)
-            </label>
-            <div className="relative">
-              <Shield className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-5" />
-              <select
-                value={form.roleId || ""}
-                onChange={(e) => setForm({ ...form, roleId: e.target.value })}
-                className="w-full appearance-none rounded-xl border border-stroke bg-gray-2 py-2.5 pl-10 pr-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white cursor-pointer transition"
-              >
-                <option value="">No initial role (assign later)</option>
-                {roles.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name} {r.isTemplate ? "(Template)" : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <CustomSelect
+              label="Role Assignment (Optional)"
+              placeholder="Choose a role..."
+              value={form.roleId || ""}
+              onChange={(val) => setForm({ ...form, roleId: val })}
+              options={roleOptions}
+              icon={<Shield className="h-4 w-4" />}
+            />
           </div>
 
           <div className="flex items-start gap-2.5 rounded-xl bg-blue-50/70 p-3 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50">
@@ -111,14 +111,14 @@ export function AddUserModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
+              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition"
+              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition cursor-pointer"
             >
               {isSubmitting ? "Inviting..." : "Send Invitation"}
             </button>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { RegionDto, UpdateRegionDto } from "@/lib/api/types";
 import { X, Map, GitBranch, Lock } from "lucide-react";
+import { CustomSelect } from "@/components/forms/select";
 
 interface EditRegionModalProps {
   isOpen: boolean;
@@ -35,13 +36,21 @@ export function EditRegionModal({
 
   if (!isOpen || !region) return null;
 
+  // Filter out self to prevent self-parenting
+  const validParents = regionsList.filter((r) => r.id !== region.id);
+
+  const parentOptions = [
+    { value: "", label: "(None - Top Level Region)" },
+    ...validParents.map((reg) => ({
+      value: reg.id,
+      label: `${reg.name} (${reg.code})`,
+    })),
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit(region.id, formData);
   };
-
-  // Filter out self and own potential sub-regions to prevent self-parenting
-  const validParents = regionsList.filter((r) => r.id !== region.id);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs overflow-y-auto">
@@ -61,7 +70,7 @@ export function EditRegionModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white transition"
+            className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white transition cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -92,29 +101,22 @@ export function EditRegionModal({
               required
               value={formData.name || ""}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
             />
           </div>
 
           {/* Parent Region */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-dark dark:text-white flex items-center gap-1">
-              <GitBranch className="h-3.5 w-3.5 text-primary" /> Parent Region Hierarchy
-            </label>
-            <select
+            <CustomSelect
+              label="Parent Region Hierarchy"
+              placeholder="Select parent region..."
               value={formData.parentId || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, parentId: e.target.value || null })
+              onChange={(val) =>
+                setFormData({ ...formData, parentId: val || null })
               }
-              className="w-full rounded-xl border border-stroke bg-gray-2 py-2.5 px-3.5 text-xs text-dark focus:border-primary focus:bg-white focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-            >
-              <option value="">(None - Top Level Region)</option>
-              {validParents.map((reg) => (
-                <option key={reg.id} value={reg.id}>
-                  {reg.name} ({reg.code})
-                </option>
-              ))}
-            </select>
+              options={parentOptions}
+              icon={<GitBranch className="h-3.5 w-3.5 text-primary" />}
+            />
           </div>
 
           {/* Active Toggle */}
@@ -140,14 +142,14 @@ export function EditRegionModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition"
+              className="rounded-xl border border-stroke bg-white px-4 py-2.5 text-xs font-semibold text-dark hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition"
+              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-primary/90 disabled:opacity-50 transition cursor-pointer"
             >
               {isSubmitting ? "Saving..." : "Save Changes"}
             </button>

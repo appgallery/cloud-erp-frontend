@@ -22,6 +22,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { NativeSelect } from "@/components/forms/select";
 
 export function UsersScreen() {
   const { activeCompanyId, activeCompanyName, fetchMyCompanies } = useAuthStore();
@@ -171,7 +172,7 @@ export function UsersScreen() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className="space-y-6">
       {/* Top Banner Header */}
       <div className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-1 dark:bg-gray-dark border border-stroke dark:border-dark-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -257,22 +258,20 @@ export function UsersScreen() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <select
+            <div className="w-48">
+              <NativeSelect
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value as any);
                   setPage(1);
                 }}
-                className="appearance-none rounded-xl border border-stroke bg-gray-2 py-2.5 pl-9 pr-9 text-xs font-semibold text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white cursor-pointer transition"
+                icon={<Filter className="h-3.5 w-3.5" />}
               >
                 <option value="all">All Members</option>
                 <option value="active">Active Only</option>
                 <option value="inactive">Inactive Only</option>
                 <option value="unassigned">Unassigned Roles Only</option>
-              </select>
-              <Filter className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-dark-5" />
+              </NativeSelect>
             </div>
           </div>
         </div>

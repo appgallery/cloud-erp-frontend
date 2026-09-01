@@ -198,7 +198,7 @@ export function RolesScreen() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className="space-y-6">
       {/* Top Banner */}
       <div className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-1 dark:bg-gray-dark border border-stroke dark:border-dark-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -289,7 +289,7 @@ export function RolesScreen() {
               : "text-dark-5 hover:text-dark dark:text-dark-6"
           )}
         >
-          <SlidersHorizontal className="h-6 w-6" />
+          <SlidersHorizontal className="h-4 w-4" />
           Permission Matrix {selectedRole ? `(${selectedRole.name})` : ""}
         </button>
       </div>

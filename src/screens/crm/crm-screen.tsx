@@ -7,7 +7,7 @@ import { Filter, Download, Briefcase } from "lucide-react";
 
 export function CrmScreen() {
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className="space-y-6">
       {/* Header Banner */}
       <div className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-1 dark:bg-gray-dark border border-stroke dark:border-dark-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
